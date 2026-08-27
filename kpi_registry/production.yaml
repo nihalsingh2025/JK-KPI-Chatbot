@@ -35,7 +35,7 @@ default_select_columns:
   - granularity
 
 gotchas:
-  - "Always filter granularity = 'day' unless the user explicitly asks for shift-level detail, otherwise shift rows will duplicate day totals."
+  - "Always filter granularity explicitly (day/month/year/shift) to avoid mixing granularities in one result."
   - "For date-range questions, default to per-day rows (granularity='day', date between X and Y). Only use SUM(actual_value) if the user asks for a total/overall figure across the range - and then drop 'date' from SELECT and GROUP BY the remaining dimensions (machine/itemcode) instead."
   - "product_type values should be matched with lower(product_type) = lower('...') to avoid case mismatches."
   - "unit_of_measurement has exactly 4 canonical values:NOS, KG, Batch, Meter. Batch only applies to the Mixing section (Master Compound, Final Compound). Map user phrasing to these exact values: numbers/number/no./pcs/piece/pieces -> NOS, kg/kgs/kilogram/kilograms -> KG, batch/batches -> Batch, meter/meters/metre/metres/mts/mt -> Meter. Never write a uom value the user typed literally without mapping it first."
