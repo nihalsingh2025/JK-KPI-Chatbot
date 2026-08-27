@@ -1,7 +1,7 @@
 # README - KPI Chatbot Codebase
 
 This document explains what each file and function does and how they
-connect. Read `tech.md` first for the design rationale; this file is the
+connect. Read `docs/tech.md` first for the design rationale; this file is the
 map of the actual code.
 
 ## Folder structure
@@ -37,13 +37,13 @@ kpi_chatbot/
 
 ## Execution flow (one user question)
 
-1. `../app.py` collects the question from the Streamlit chat input and calls
+1. `app.py` collects the question from the Streamlit chat input and calls
    `graph.invoke({"user_query": question})`.
-2. The compiled LangGraph (built by `../graph/build_graph.py`) runs the
+2. The compiled LangGraph (built by `graph/build_graph.py`) runs the
    nodes in order:
    `retrieve_kpi_context -> generate_sql -> execute_sql -> format_answer`,
    then conditionally `-> plot` if the question asked for a chart.
-3. `../app.py` reads the final state and renders the answer text, an
+3. `app.py` reads the final state and renders the answer text, an
    optional chart, and an optional CSV download button.
 
 Every node takes an `AgentState` dict, mutates/adds keys, and returns it.
@@ -59,7 +59,7 @@ directory. Nothing else in the codebase should hardcode these values.
 ## graph/state.py
 
 Defines `AgentState`, the `TypedDict` passed between all nodes. See
-`tech.md` section 3 for the "no raw rows in state" principle this
+`docs/tech.md` section 3 for the "no raw rows in state" principle this
 enforces. Fields are grouped by phase: input, retrieval, SQL
 generation/execution, results, plotting, final output.
 
@@ -70,14 +70,14 @@ generation/execution, results, plotting, final output.
   node or straight to `END`.
 - `build_graph()` - constructs the `StateGraph`, registers all five
   nodes, wires the linear edges plus the one conditional edge, and
-  returns the compiled graph that `../app.py` calls `.invoke()` on.
+  returns the compiled graph that `app.py` calls `.invoke()` on.
 
 ## graph/nodes/retrieve_kpi_context.py
 
 - `retrieve_kpi_context(state)` - calls `retriever.retrieve(query)` from
-  `../retrieval/embed_store.py` to get the top-k matching KPI registry
+  `retrieval/embed_store.py` to get the top-k matching KPI registry
   entries, and `relevant_enum_context(query)` from
-  `../retrieval/enum_values.py` to get any exact column values mentioned in
+  `retrieval/enum_values.py` to get any exact column values mentioned in
   the question. Writes both into `state["kpi_context"]` and
   `state["enum_context"]`.
 
@@ -116,7 +116,7 @@ generation/execution, results, plotting, final output.
 - `plot(state)` - loads the full cached dataframe via
   `tools/file_cache.load_result()`, calls `tools/plotting.render()` with
   the chosen spec, and stores the resulting Plotly figure object in
-  `state["_figure"]` for `../app.py` to display. Does nothing if there is no
+  `state["_figure"]` for `app.py` to display. Does nothing if there is no
   cached result to plot.
 
 ## kpi_registry/*.yaml
@@ -127,12 +127,12 @@ One file per KPI family (`production.yaml`, `oee.yaml`,
 variants to use, e.g. `Production` vs `Production_m`),
 `default_select_columns`, `gotchas` (known correctness pitfalls in the
 data), and `example_questions` (few-shot question/SQL pairs). This is
-plain data, loaded and embedded by `../retrieval/embed_store.py` - adding a
+plain data, loaded and embedded by `retrieval/embed_store.py` - adding a
 new KPI family means adding a new YAML file here, nothing else.
 
 ## retrieval/embed_store.py
 
-- `_load_registry()` - reads every YAML file in `../kpi_registry` into a
+- `_load_registry()` - reads every YAML file in `kpi_registry` into a
   list of dicts.
 - `_embed_text(text)` - calls the OpenAI embeddings API for a string.
 - `_doc_text(entry)` - flattens one registry entry's description and
@@ -166,7 +166,7 @@ Static Python lists/dicts of known column values (`PRODUCT_TYPES`,
 ## tools/file_cache.py
 
 - `cache_result(rows)` - converts rows to a pandas DataFrame, writes it
-  to a parquet file under `../.result_cache` named by a new UUID
+  to a parquet file under `.result_cache` named by a new UUID
   (`result_id`), and returns metadata (`result_id`, `row_count`,
   `columns`, `preview_rows`, `download_path`).
 - `load_result(result_id)` - reads a cached parquet file back into a
@@ -180,7 +180,7 @@ Static Python lists/dicts of known column values (`PRODUCT_TYPES`,
   Express that take a DataFrame and column names.
 - `CHART_FUNCTIONS` - maps chart type strings to the functions above.
 - `render(chart_type, df, **kwargs)` - dispatch function used by
-  `../graph/nodes/plot.py`; this is the only function outside this file
+  `graph/nodes/plot.py`; this is the only function outside this file
   that needs to know charts exist.
 
 ## app.py
@@ -196,7 +196,7 @@ when `row_count` exceeds the large-result threshold.
 
 - `OPENAI_API_KEY` - used by `generate_sql.py`, `format_answer.py`,
   `plot.py`, and `embed_store.py`.
-- `DATABRICKS_API_KEY` - used by `../tools/databricks_api.py`.
+- `DATABRICKS_API_KEY` - used by `tools/databricks_api.py`.
 
 ## Running it
 

@@ -139,7 +139,7 @@ queries select only the columns relevant to that KPI family instead of
 
 ## 11. Folder structure
 
-See `readme.md` for a full function-by-function breakdown of every file.
+See `../readme.md` for a full function-by-function breakdown of every file.
 
 ## 12. Open items / v2 candidates
 
