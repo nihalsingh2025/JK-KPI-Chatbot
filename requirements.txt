@@ -1,0 +1,13 @@
+streamlit
+langgraph
+langchain-openai
+openai
+pandas
+pyyaml
+numpy
+plotly
+pyarrow
+requests
+python-dotenv
+langsmith
+rapidfuzz

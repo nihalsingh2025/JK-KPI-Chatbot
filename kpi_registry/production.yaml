@@ -1,0 +1,69 @@
+kpi_family: production
+kpi_names:
+  - Production
+  - Production_m
+  - Production_m_sku
+  - Production_sku
+
+description: >
+  Production KPIs measure how much of a product_type was made.
+  There are 4 variants depending on how the user wants it grouped:
+  Production (overall, no machine/sku breakdown), Production_m (per machine),
+  Production_sku (per sku/itemcode), Production_m_sku (per machine per sku).
+  All variants are grouped by unit_of_measurement (uom) - a product made in
+  more than one uom will return multiple rows.
+
+variant_selection_rules:
+  - if: "user does not mention machine or sku"
+    use: Production
+  - if: "user mentions machine but not sku"
+    use: Production_m
+  - if: "user mentions sku/itemcode but not machine"
+    use: Production_sku
+  - if: "user mentions both machine and sku"
+    use: Production_m_sku
+  - if: "ambiguous / neither mentioned"
+    use: Production
+
+default_select_columns:
+  - date
+  - product_type
+  - machine
+  - itemcode
+  - unit_of_measurement
+  - actual_value
+  - granularity
+
+gotchas:
+  - "Always filter granularity = 'day' unless the user explicitly asks for shift-level detail, otherwise shift rows will duplicate day totals."
+  - "For date-range questions, default to per-day rows (granularity='day', date between X and Y). Only use SUM(actual_value) if the user asks for a total/overall figure across the range - and then drop 'date' from SELECT and GROUP BY the remaining dimensions (machine/itemcode) instead."
+  - "product_type values should be matched with lower(product_type) = lower('...') to avoid case mismatches."
+  - "unit_of_measurement has exactly 4 canonical values:NOS, KG, Batch, Meter. Batch only applies to the Mixing section (Master Compound, Final Compound). Map user phrasing to these exact values: numbers/number/no./pcs/piece/pieces -> NOS, kg/kgs/kilogram/kilograms -> KG, batch/batches -> Batch, meter/meters/metre/metres/mts/mt -> Meter. Never write a uom value the user typed literally without mapping it first."
+example_questions:
+  - question: "Give me ply production machine wise for the date 1 june 2026"
+    sql: |
+      SELECT date, machine, unit_of_measurement, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'production_m'
+        AND lower(product_type) = 'ply'
+        AND lower(granularity) = 'day'
+        AND date = Date '2026-06-01'
+
+  - question: "What is the total tread production between 1 July 2026 and 10 July 2026?"
+    sql: |
+      SELECT machine, unit_of_measurement, SUM(actual_value) AS actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'production_m'
+        AND lower(product_type) = 'tread'
+        AND lower(granularity) = 'day'
+        AND date BETWEEN Date '2026-07-01' AND Date '2026-07-10'
+      GROUP BY machine, unit_of_measurement
+
+  - question: "Show me sidewall production for 16 Aug 2026"
+    sql: |
+      SELECT date, unit_of_measurement, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'production'
+        AND lower(product_type) = 'sidewall'
+        AND lower(granularity) = 'day'
+        AND date = Date '2026-08-16'

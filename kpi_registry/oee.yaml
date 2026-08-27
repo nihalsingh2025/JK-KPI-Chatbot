@@ -1,0 +1,77 @@
+kpi_family: oee
+kpi_names:
+  - Availability_m
+  - Availability_o
+  - Availability_s
+  - Performance_m
+  - Performance_o
+  - Performance_s
+  - Quality_m
+  - Quality_o
+  - Quality_s
+  - OEE_m
+  - OEE_o
+  - OEE_p
+  - OEE_s
+
+description: >
+  OEE (Overall Equipment Effectiveness) is Availability * Performance *
+  Quality. All four KPIs (Availability, Performance, Quality, OEE) are
+  precalculated at multiple levels: _m (machine wise), _o (section wise -
+  Mixing, Stock, Curing, Tyre Building), _s (sub_section wise - only Stock
+  has sub_sections: Extruder, 4 Roll, Bead, 3 Roll), and OEE_p (whole
+  plant). No aggregation across levels is needed - each level is already
+  calculated and stored.
+
+variant_selection_rules:
+  - if: "user mentions a specific machine"
+    use: "<KPI>_m (e.g. Availability_m, OEE_m)"
+  - if: "user mentions a section (mixing/stock/curing/tyre building)"
+    use: "<KPI>_o"
+  - if: "user mentions a sub_section (extruder/4 roll/bead/3 roll, only within Stock)"
+    use: "<KPI>_s"
+  - if: "user asks about the whole plant / overall OEE with no section or machine"
+    use: OEE_p
+  - if: "ambiguous"
+    use: "<KPI>_o at the most commonly asked section, or ask for clarification if no section-like term appears"
+
+default_select_columns:
+  - date
+  - machine
+  - section
+  - sub_section
+  - actual_value
+  - granularity
+
+gotchas:
+  - "OEE = Availability * Performance * Quality conceptually, but OEE is already precalculated per row - never compute it manually from the other three."
+  - "sub_section only exists for the Stock section; do not filter on sub_section for other sections."
+  - "Always filter granularity explicitly (day/month/year/shift) to avoid mixing granularities in one result."
+  - "Use lower() for section, sub_section, and machine comparisons."
+
+example_questions:
+  - question: "What is the availability of mixing section for the month of jan 2026?"
+    sql: |
+      SELECT date, section, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'availability_o'
+        AND lower(granularity) = 'month'
+        AND lower(section) = 'mixing'
+        AND date = Date '2026-01-01'
+
+  - question: "Show me OEE of machine 0204 for 5 aug 2026"
+    sql: |
+      SELECT date, machine, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'oee_m'
+        AND lower(granularity) = 'day'
+        AND lower(machine) = '0204'
+        AND date = Date '2026-08-05'
+
+  - question: "What was overall plant OEE for July 2026?"
+    sql: |
+      SELECT date, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'oee_p'
+        AND lower(granularity) = 'month'
+        AND date = Date '2026-07-01'
