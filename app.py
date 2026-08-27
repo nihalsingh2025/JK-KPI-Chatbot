@@ -5,11 +5,16 @@ LangGraph agent once and displays the answer, an optional chart, and an
 optional download button for large results.
 """
 
+import os
 import streamlit as st
 
 from graph.build_graph import build_graph
 from tools.file_cache import export_csv
 from config import LARGE_RESULT_ROW_THRESHOLD
+
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
+os.environ["LANGCHAIN_PROJECT"] = "kpi_chatbot"
 
 st.set_page_config(page_title="KPI Assistant", layout="centered")
 
