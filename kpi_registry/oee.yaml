@@ -49,6 +49,7 @@ gotchas:
   - "Always filter granularity explicitly (day/month/year/shift) to avoid mixing granularities in one result."
   - "Use lower() for section, sub_section, and machine comparisons."
   - "When drilling down an OEE-family result (Availability/Performance/Quality decomposition), the new query must keep every WHERE-clause filter from the previous OEE query except kpi_name - specifically including section, sub_section, or machine if the previous query had one. Do not drop these filters; only change kpi_name to the IN (...) list and remove the OEE-specific suffix."
+  - "When the user asks for a follow-up 'drill down', 'decompose', or 'detailed view' after an OEE-family question, show Availability, Performance, and Quality KPIs with the same filters as the previous OEE query. This is NOT the Breakdown/downtime-reason KPI family, even if the user says the word 'breakdown' - that word in this context refers to breaking OEE into its components, not machine downtime reasons."
 example_questions:
   - question: "What is the availability of mixing section for the month of jan 2026?"
     sql: |
