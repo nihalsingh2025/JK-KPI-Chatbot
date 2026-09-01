@@ -12,7 +12,12 @@ description: >
   Production_sku (per sku/itemcode), Production_m_sku (per machine per sku).
   All variants are grouped by unit_of_measurement (uom) - a product made in
   more than one uom will return multiple rows.
-
+  It has four section - mixing,stock,curing,tbm(tyre building machine)
+  and these are the product type which are produced - "Bead Apex", "Bead Bundle", "Belt", "Belt Mother Roll", "Cap Strip",
+    "Cap Strip Mother Roll", "Carcass", "Chaffer", "Chaffer Mother Roll",
+    "Cured Tyre", "Final Compound", "Green Tyre", "Inner Liner",
+    "Master Compound", "Ply", "Ply Mother Roll", "Sidewall", "Tread".
+  And only stock section has sub_section which are - Slitter,Bead,Extruder,Cutter,4 Roll,3 Roll
 variant_selection_rules:
   - if: "user does not mention machine or sku"
     use: Production
@@ -33,7 +38,8 @@ default_select_columns:
   - unit_of_measurement
   - actual_value
   - granularity
-
+  - section
+  - subsection
 gotchas:
   - "Always filter granularity explicitly (day/month/year/shift) to avoid mixing granularities in one result."
   - "For date-range questions, default to per-day rows (granularity='day', date between X and Y). Only use SUM(actual_value) if the user asks for a total/overall figure across the range - and then drop 'date' from SELECT and GROUP BY the remaining dimensions (machine/itemcode) instead."
@@ -67,3 +73,12 @@ example_questions:
         AND lower(product_type) = 'sidewall'
         AND lower(granularity) = 'day'
         AND date = Date '2026-08-16'
+
+  - question: "What is the production of curing in july 2026"
+    sql: |
+      SELECT date, unit_of_measurement, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) = 'production'
+        AND lower(section) = 'curing'
+        AND lower(granularity) = 'month'
+        AND date = Date '2026-07-01'

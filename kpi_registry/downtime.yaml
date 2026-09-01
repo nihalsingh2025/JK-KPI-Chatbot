@@ -1,4 +1,4 @@
-kpi_family: breakdown
+kpi_family: downtime_reason
 kpi_names:
   - Breakdown
   - No Schedule

@@ -19,7 +19,7 @@ PRODUCT_TYPES = [
     "Master Compound", "Ply", "Ply Mother Roll", "Sidewall", "Tread",
 ]
 
-SECTIONS = ["Mixing", "Stock", "Curing", "Tyre Building"]
+SECTIONS = ["Mixing", "Stock", "Curing", "TBM"]
 
 # sub_section currently only applies within the Stock section
 SUB_SECTIONS = {
@@ -96,5 +96,9 @@ def relevant_enum_context(user_query: str) -> dict:
         for section in matched_sections:
             if section in SUB_SECTIONS:
                 context["sub_section"] = SUB_SECTIONS[section]
+
+    matched_granularities = _fuzzy_match_all(user_query, GRANULARITIES)
+    if matched_granularities:
+        context["granularity"] = matched_granularities
 
     return context

@@ -79,11 +79,5 @@ def plot(state: AgentState) -> AgentState:
         )
         return state
 
-    df = load_result(state["result_id"])
-    kwargs = plot_spec.model_dump(exclude={"chart_type"}, exclude_none=True)
-    figure = render(plot_spec.chart_type, df, **kwargs)
-
     # typed AgentState contract, kept as a plain dict key for simplicity.
-    state["figure"] = figure
-
     return state

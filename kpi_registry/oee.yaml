@@ -42,13 +42,13 @@ default_select_columns:
   - sub_section
   - actual_value
   - granularity
-
+  - unit_of_measurement
 gotchas:
-  - "OEE = Availability * Performance * Quality conceptually, but OEE is already precalculated per row - never compute it manually from the other three."
+  - "OEE = Availability * Performance * Quality conceptually, but OEE is already precalculated per row - never compute it manually from the other three. But if asked about the drill-down of particular OEE we can show the corresponding all three KPIs for that same date/granularity."
   - "sub_section only exists for the Stock section; do not filter on sub_section for other sections."
   - "Always filter granularity explicitly (day/month/year/shift) to avoid mixing granularities in one result."
   - "Use lower() for section, sub_section, and machine comparisons."
-
+  - "When drilling down an OEE-family result (Availability/Performance/Quality decomposition), the new query must keep every WHERE-clause filter from the previous OEE query except kpi_name - specifically including section, sub_section, or machine if the previous query had one. Do not drop these filters; only change kpi_name to the IN (...) list and remove the OEE-specific suffix."
 example_questions:
   - question: "What is the availability of mixing section for the month of jan 2026?"
     sql: |
@@ -74,4 +74,21 @@ example_questions:
       FROM gold.gold
       WHERE lower(kpi_name) = 'oee_p'
         AND lower(granularity) = 'month'
+        AND date = Date '2026-07-01'
+
+  - question: "What are the drill down for OEE of mixing section for the month for March 2026?"
+    sql: |
+      SELECT kpi_name, date, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) in ('availability_o','performance_o','quality_o')
+        AND lower(granularity) = 'month'
+        AND date = Date '2026-03-01'
+
+  - question: " {What is the oee of curing for the month of july 2026} (turn 1), {then can you give me its drill-down} (turn 2)"
+    sql: |
+      SELECT kpi_name, date, actual_value
+      FROM gold.gold
+      WHERE lower(kpi_name) IN ('availability_o', 'performance_o', 'quality_o')
+        AND lower(granularity) = 'month'
+        AND lower(section) = 'curing'
         AND date = Date '2026-07-01'
