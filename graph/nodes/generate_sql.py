@@ -67,7 +67,7 @@ def _build_user_prompt(state: AgentState) -> str:
             parts.append(f"Q: {entry.user_query}\nSQL: {entry.generated_sql}")
         parts.append("")
 
-    parts.append(f"TODAY_DATE: {date.today().isoformat()} (use ONLY for literal 'today'/'current' references, never for 'that day'/'this day' - see date resolution rules)" )
+    parts.append(f"TODAY_DATE: {date.today().isoformat()} (** ONLY use for literal 'today'/'current' references, never for 'that day'/'this day' - see date resolution rules)**" )
 
     return "\n".join(parts)
 
