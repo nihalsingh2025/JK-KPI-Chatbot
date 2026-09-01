@@ -15,7 +15,7 @@ DATABRICKS_TABLE = "gold.gold"
 
 # --- OpenAI ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-CHAT_MODEL = "gpt-4o-mini"
+CHAT_MODEL = "gpt-4o"
 EMBEDDING_MODEL = "text-embedding-3-small"
 
 # --- Result size routing ---
