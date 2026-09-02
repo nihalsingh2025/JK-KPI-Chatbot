@@ -14,12 +14,36 @@ from tools.file_cache import export_csv
 from config import LARGE_RESULT_ROW_THRESHOLD
 from tools.file_cache import load_result
 from tools.plotting import render
+from dotenv import load_dotenv
+load_dotenv()
 
-# os.environ["LANGSMITH_TRACING"] = "true"
-# os.environ["LANGSMITH_API_KEY"] = st.secrets["LANGSMITH_API_KEY"]
-# os.environ["LANGSMITH_PROJECT"] = "kpi_chatbot"
+if "LANGSMITH_API_KEY" in st.secrets:
+    os.environ["LANGSMITH_API_KEY"] = st.secrets["LANGSMITH_API_KEY"]
+
+if "LANGSMITH_TRACING" in st.secrets:
+    os.environ["LANGSMITH_TRACING"] = st.secrets["LANGSMITH_TRACING"]
+
+if "LANGSMITH_PROJECT" in st.secrets:
+    os.environ["LANGSMITH_PROJECT"] = st.secrets["LANGSMITH_PROJECT"]
 
 st.set_page_config(page_title="KPI Assistant", layout="centered")
+
+st.sidebar.subheader("🔍 LangSmith Debug")
+
+st.sidebar.write(
+    "Tracing:",
+    os.getenv("LANGSMITH_TRACING")
+)
+
+st.sidebar.write(
+    "Project:",
+    os.getenv("LANGSMITH_PROJECT")
+)
+
+st.sidebar.write(
+    "API Key Loaded:",
+    os.getenv("LANGSMITH_API_KEY")
+)
 
 if "graph" not in st.session_state:
     st.session_state.graph = build_graph()
