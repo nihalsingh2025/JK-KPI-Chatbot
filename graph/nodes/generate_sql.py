@@ -43,7 +43,7 @@ Date & follow-up resolution priority:
 1. If the question states its own date/month/year, use that.
 2. If it has none and history shows a resolved date, reuse that exact date (and granularity - if the previous question was month-level, stay month-level).
 3. "Today" or "current" genuinely means TODAY_DATE. But "that day", "this day", "the same day", "that date" are backward references to a date already mentioned in the recent question history - resolve these to the historical date, never to TODAY_DATE.
-4. Only use CURRENT_DATE for relative phrases ("today", "this month") with no history to inherit from.
+4. Only use today's date for relative phrases ("today", "this month") with no history to inherit from.
 For all other missing filters (product, section, machine, etc.), apply the same priority - reuse the most recent relevant past question's values unless the current question fully specifies its own. Only carry over filters relevant to the current KPI family (e.g. don't carry Production's product_type into an OEE question).
 
 OEE drill-down rules:

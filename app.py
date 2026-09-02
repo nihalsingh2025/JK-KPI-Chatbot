@@ -28,23 +28,6 @@ if "LANGSMITH_PROJECT" in st.secrets:
 
 st.set_page_config(page_title="KPI Assistant", layout="centered")
 
-st.sidebar.subheader("🔍 LangSmith Debug")
-
-st.sidebar.write(
-    "Tracing:",
-    os.getenv("LANGSMITH_TRACING")
-)
-
-st.sidebar.write(
-    "Project:",
-    os.getenv("LANGSMITH_PROJECT")
-)
-
-st.sidebar.write(
-    "API Key Loaded:",
-    bool(st.secrets.get("LANGSMITH_API_KEY"))
-)
-
 if "graph" not in st.session_state:
     st.session_state.graph = build_graph()
 
