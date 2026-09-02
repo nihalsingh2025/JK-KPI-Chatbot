@@ -42,7 +42,7 @@ st.sidebar.write(
 
 st.sidebar.write(
     "API Key Loaded:",
-    os.getenv("LANGSMITH_API_KEY")
+    bool(st.secrets.get("LANGSMITH_API_KEY"))
 )
 
 if "graph" not in st.session_state:
