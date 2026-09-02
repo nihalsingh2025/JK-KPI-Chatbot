@@ -53,7 +53,7 @@ gotchas:
 example_questions:
   - question: "What is the availability of mixing section for the month of jan 2026?"
     sql: |
-      SELECT date, section, actual_value
+      SELECT date, section, actual_value,granularity,unit_of_measurement
       FROM gold.gold
       WHERE lower(kpi_name) = 'availability_o'
         AND lower(granularity) = 'month'
@@ -62,7 +62,7 @@ example_questions:
 
   - question: "Show me OEE of machine 0204 for 5 aug 2026"
     sql: |
-      SELECT date, machine, actual_value
+      SELECT date, machine, actual_value,granularity,unit_of_measurement
       FROM gold.gold
       WHERE lower(kpi_name) = 'oee_m'
         AND lower(granularity) = 'day'
@@ -71,7 +71,7 @@ example_questions:
 
   - question: "What was overall plant OEE for July 2026?"
     sql: |
-      SELECT date, actual_value
+      SELECT date, actual_value,granularity,unit_of_measurement
       FROM gold.gold
       WHERE lower(kpi_name) = 'oee_p'
         AND lower(granularity) = 'month'
@@ -79,7 +79,7 @@ example_questions:
 
   - question: "What are the drill down for OEE of mixing section for the month for March 2026?"
     sql: |
-      SELECT kpi_name, date, actual_value
+      SELECT kpi_name, date, actual_value,granularity,unit_of_measurement
       FROM gold.gold
       WHERE lower(kpi_name) in ('availability_o','performance_o','quality_o')
         AND lower(granularity) = 'month'
@@ -87,7 +87,7 @@ example_questions:
 
   - question: " {What is the oee of curing for the month of july 2026} (turn 1), {then can you give me its drill-down} (turn 2)"
     sql: |
-      SELECT kpi_name, date, actual_value
+      SELECT kpi_name, date, actual_value,granularity,unit_of_measurement
       FROM gold.gold
       WHERE lower(kpi_name) IN ('availability_o', 'performance_o', 'quality_o')
         AND lower(granularity) = 'month'
