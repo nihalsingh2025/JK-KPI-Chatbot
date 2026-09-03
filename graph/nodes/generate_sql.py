@@ -10,14 +10,14 @@ token usage proportional to what the question actually needs.
 import json
 from pydantic import  BaseModel
 from langchain_openai import ChatOpenAI
-from config import CHAT_MODEL, OPENAI_API_KEY, DATABRICKS_TABLE
+from config import SQL_MODEL, OPENAI_API_KEY, DATABRICKS_TABLE
 from graph.state import AgentState,QueryHistoryEntry
 from datetime import date
 
 class SQLQuery(BaseModel):
     sql: str
 
-_llm = ChatOpenAI(model=CHAT_MODEL, api_key=OPENAI_API_KEY, temperature=0).with_structured_output(SQLQuery)
+_llm = ChatOpenAI(model=SQL_MODEL, api_key=OPENAI_API_KEY, temperature=0).with_structured_output(SQLQuery)
 
 SYSTEM_PROMPT = f"""You are a SQL generation assistant for a tyre
 manufacturing KPI dashboard. You write a single Databricks SQL SELECT
@@ -25,7 +25,7 @@ statement against the table {DATABRICKS_TABLE}.
 
 General rules:
 - Always use lower() when comparing string columns to static values.
-- Only select the columns listed under default_select_columns for the matched KPI family, plus any columns needed to answer the question.
+- For each query Always SELECT every column listed under default_select_columns for it's belonging KPI family - never omit one, Even if it is a follow-up question. Add extra columns beyond that list only if the question specifically needs them.
 - Follow the variant_selection_rules and gotchas given in the KPI context exactly.
 - Default to the overall (non machine/sku-specific) KPI variant if the question does not specify a breakdown.
 - Always sort results with ORDER BY date ASC by default, unless the user explicitly asks for a different sort order.

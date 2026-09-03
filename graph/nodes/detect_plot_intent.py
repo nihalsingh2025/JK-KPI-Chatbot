@@ -9,7 +9,7 @@ list, which missed phrasings like "trend" or "breakdown by".
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
-from config import CHAT_MODEL, OPENAI_API_KEY
+from config import FAST_MODEL, OPENAI_API_KEY
 from graph.state import AgentState
 
 
@@ -17,7 +17,7 @@ class PlotIntent(BaseModel):
     wants_plot: bool
 
 
-_llm = ChatOpenAI(model=CHAT_MODEL, api_key=OPENAI_API_KEY, temperature=0).with_structured_output(PlotIntent)
+_llm = ChatOpenAI(model=FAST_MODEL, api_key=OPENAI_API_KEY, temperature=0).with_structured_output(PlotIntent)
 
 SYSTEM_PROMPT = """
 Decide whether the user's question is asking for a

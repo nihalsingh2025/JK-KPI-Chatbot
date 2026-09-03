@@ -24,6 +24,7 @@ SECTIONS = ["Mixing", "Stock", "Curing", "TBM"]
 # sub_section currently only applies within the Stock section
 SUB_SECTIONS = {
     "Stock": ["Extruder", "4 Roll", "Bead", "3 Roll"],
+    "Curing": ["Trench1","Trench2","Trench3","Trench4","Trench5","Trench6","Trench7","Trench8"]
 }
 
 CATEGORIES = [
@@ -93,9 +94,11 @@ def relevant_enum_context(user_query: str) -> dict:
     matched_sections = _fuzzy_match_all(user_query, SECTIONS)
     if matched_sections:
         context["section"] = matched_sections
-        for section in matched_sections:
-            if section in SUB_SECTIONS:
-                context["sub_section"] = SUB_SECTIONS[section]
+
+    all_sub_sections = [v for values in SUB_SECTIONS.values() for v in values]
+    matched_sub_sections = _fuzzy_match_all(user_query, all_sub_sections)
+    if matched_sub_sections:
+        context["sub_section"] = matched_sub_sections
 
     matched_granularities = _fuzzy_match_all(user_query, GRANULARITIES)
     if matched_granularities:

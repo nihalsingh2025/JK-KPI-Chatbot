@@ -13,7 +13,7 @@ from langchain_openai import ChatOpenAI
 from typing import Optional, Literal
 from pydantic import BaseModel
 
-from config import CHAT_MODEL, OPENAI_API_KEY
+from config import FAST_MODEL, OPENAI_API_KEY
 from graph.state import AgentState
 from tools.file_cache import load_result
 from tools.plotting import render
@@ -24,7 +24,7 @@ class PlotSpec(BaseModel):
     y: str
     group_by: Optional[str] = None
 
-_llm = ChatOpenAI(model=CHAT_MODEL, api_key=OPENAI_API_KEY, temperature=0).with_structured_output(PlotSpec)
+_llm = ChatOpenAI(model=FAST_MODEL, api_key=OPENAI_API_KEY, temperature=0).with_structured_output(PlotSpec)
 
 SYSTEM_PROMPT = """You choose how to visualize a KPI query result. Based on
 the user's question, the available columns, and a small preview of the
