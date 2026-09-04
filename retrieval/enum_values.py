@@ -32,6 +32,35 @@ CATEGORIES = [
     "Process Audit", "Inventory", "Uniformity Testing",
 ]
 
+SCRAP_REMARKS = [
+    "Bare cord", "Split Cord", "VCL Not Out", "BFC/ RIM Line crack",
+    "Cony off", "IL Lumpy", "Blow Point", "Thermocouple", "L/Heal",
+    "PCI Damage", "No Internal", "Conv Damage", "IL Blister",
+    "Press Not Close", "Reverse Hump", "Late Open", "Carcass Buckle",
+    "Bent Bead", "SW Splice open", "Shaping Cut/Fluctuation", "FM Oil",
+    "Arm Damage", "SW Blow", "Tread Edge blow", "NITROGEN DROP",
+    "FM White Powder", "Tread Under Cure", "Belt off Centre",
+    "O Ring Leak", "Spread Cord", "A.Bridging / BNT", "FM Metal",
+    "Heavy Splice", "Flash cure", "No Paint / Missing Paint", "Bead Blow",
+    "Flow Crack", "Carcass Under Cure", "FM Other", "WEAK SW",
+    "Thick Toe Cure", "TUO Damage", "Bead Blister", "Bladder Mark",
+    "Bladder Leak", "Open Splice", "BOB", "Bead Buckle", "Assembly Off",
+    "Operational Failure", "SW lamination", "Light SW", "Cap Strip Off",
+    "Shoulder Below", "Bead Under cure", "TUO Con. Damage", "FM Plastic",
+    "FM Dust", "TREAD EDGE OPEN", "Platen Temp. Drop", "GT scrap",
+    "Thick toe", "Separation", "Paint FM", "T/up blow", "FM Curing",
+    "Tread Blow", "Poor Buff", "Pulled bead/Narrow bead",
+    "FM Bleeder Yarn", "Vent Cure", "Undulation", "OCL", "Development",
+    "Wild Wire", "Bladder Fold", "IL Wrinkle", "IL Circ Crack",
+    "Tread Cushion Gauge Heavy", "Reloading", "FM Poly", "Project",
+    "LR Damage", "Tread Chipping", "HP Drop", "LR Not Raise",
+    "Tread Lamination", "Light Tread", "Power Fail", "Parallel Belt",
+    "Knife Cut", "Press trial", "Int. Temp. Drop", "SW Under Cure",
+    "DBM Off", "MP Drop", "Light S/W flow crack", "Extra Cure",
+    "Dirty Mould", "N2 drop", "IL Lamination", "Platen Temp. High",
+    "Late Internal", "Open Mold",
+]
+
 GRANULARITIES = ["DAY", "MONTH", "YEAR", "SHIFT A", "SHIFT B", "SHIFT C"]
 
 # tuned against real typo/spacing test cases - see testing/test_fuzzy_match.py
@@ -41,7 +70,7 @@ FUZZY_THRESHOLD = 70
 # the user query (e.g. "Cap Strip Mother Roll" = 4 words)
 _MAX_PHRASE_WORDS = max(
     len(value.split())
-    for group in (PRODUCT_TYPES, SECTIONS)
+    for group in (PRODUCT_TYPES, SECTIONS,SUB_SECTIONS,CATEGORIES,SCRAP_REMARKS,GRANULARITIES)
     for value in group
 )
 
@@ -103,5 +132,9 @@ def relevant_enum_context(user_query: str) -> dict:
     matched_granularities = _fuzzy_match_all(user_query, GRANULARITIES)
     if matched_granularities:
         context["granularity"] = matched_granularities
+
+    matched_remarks = _fuzzy_match_all(user_query,SCRAP_REMARKS)
+    if matched_remarks:
+        context["scrap_remarks"] = matched_remarks
 
     return context
