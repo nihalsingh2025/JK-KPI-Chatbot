@@ -9,6 +9,7 @@ Flow:
 """
 
 from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import InMemorySaver
 
 from graph.state import AgentState
 from graph.nodes.retrieve_kpi_context import retrieve_kpi_context
@@ -16,21 +17,12 @@ from graph.nodes.generate_sql import generate_sql
 from graph.nodes.execute_sql import execute_sql
 from graph.nodes.format_answer import format_answer
 from graph.nodes.plot import plot
+from graph.nodes.detect_plot_intent import detect_plot_intent
 
 
-# Keyword check used to decide whether the plot node should run at all.
-# Kept intentionally simple - a full LLM call just to decide "should I
-# plot" would be wasteful for a binary decision like this.
-PLOT_KEYWORDS = ["graph", "chart", "plot", "visual","visualize", "compare", "comparison","trend"]
-
-
-def _wants_plot(state: AgentState) -> str:
-    """Conditional edge: route to the plot node only on explicit visual asks."""
-    query_lower = state["user_query"].lower()
-    if any(keyword in query_lower for keyword in PLOT_KEYWORDS):
-        return "plot"
-    return "end"
-
+#A full LLM call just to decide "should I plot" would be wasteful for a binary decision like this.
+def _route_after_format_answer(state: AgentState) -> str:
+    return "plot" if state.get("wants_plot") else "end"
 
 def build_graph():
     graph = StateGraph(AgentState)
@@ -39,6 +31,7 @@ def build_graph():
     graph.add_node("generate_sql", generate_sql)
     graph.add_node("execute_sql", execute_sql)
     graph.add_node("format_answer", format_answer)
+    graph.add_node("detect_plot_intent", detect_plot_intent)
     graph.add_node("plot", plot)
 
     graph.set_entry_point("retrieve_kpi_context")
@@ -46,11 +39,14 @@ def build_graph():
     graph.add_edge("generate_sql", "execute_sql")
     graph.add_edge("execute_sql", "format_answer")
 
+    graph.add_edge("format_answer", "detect_plot_intent")
+
     graph.add_conditional_edges(
-        "format_answer",
-        _wants_plot,
+        "detect_plot_intent",
+        _route_after_format_answer,
         {"plot": "plot", "end": END},
     )
     graph.add_edge("plot", END)
 
-    return graph.compile()
+    checkpointer = InMemorySaver()
+    return graph.compile(checkpointer=checkpointer)

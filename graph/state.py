@@ -6,11 +6,20 @@ makes the graph easy to trace and debug.
 """
 
 from typing import TypedDict, Optional, List, Dict, Any
+from pydantic import BaseModel
 
+class QueryHistoryEntry(BaseModel):
+    user_query: str
+    generated_sql: str
+    kpi_family: str
 
 class AgentState(TypedDict, total=False):
     # input
     user_query: str
+
+    # conversation memory
+    query_history: List[QueryHistoryEntry]
+    current_kpi_family: Optional[str]
 
     # retrieval
     kpi_context: List[Dict[str, Any]]      # top-k matched KPI registry fragments
@@ -31,9 +40,6 @@ class AgentState(TypedDict, total=False):
     wants_plot: bool
     plot_spec: Optional[Dict[str, Any]]    # {chart_type, x, y, group_by}
     plot_path: Optional[str]
-
-    #figure
-    figure: Optional[Any]
 
     # final output
     final_answer: Optional[str]

@@ -122,7 +122,7 @@ generation/execution, results, plotting, final output.
 ## kpi_registry/*.yaml
 
 One file per KPI family (`production.yaml`, `oee.yaml`,
-`breakdown.yaml`). Each has the same shape: `kpi_family`, `kpi_names`,
+`downtime.yaml`). Each has the same shape: `kpi_family`, `kpi_names`,
 `description`, `variant_selection_rules` (which of several KPI name
 variants to use, e.g. `Production` vs `Production_m`),
 `default_select_columns`, `gotchas` (known correctness pitfalls in the
